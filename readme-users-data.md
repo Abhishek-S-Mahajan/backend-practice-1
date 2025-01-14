@@ -13,3 +13,11 @@
     "password": "tonystark",
     "role": "admin"
 }
+
+#3 BRUCE BANNER
+{
+    "username": "BruceBanner",
+    "email": "bruce.banner@marvel.com",
+    "password": "brucebanner",
+    "role": "user"
+}

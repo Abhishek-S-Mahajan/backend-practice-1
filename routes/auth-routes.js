@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { registerNewUser, loginExistingUser } from "../controllers/auth-controller.js";
+import { registerNewUser, loginExistingUser, changePassword } from "../controllers/auth-controller.js";
+import { authMiddleware } from "../middleware/auth-middleware.js";
 
 
 const router = Router();
@@ -11,6 +12,11 @@ router.post("/register", registerNewUser);
 
 // login route
 router.post("/login", loginExistingUser);
+
+
+
+// change password route
+router.post("/change-password", authMiddleware, changePassword);
 
 
 

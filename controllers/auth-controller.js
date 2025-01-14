@@ -108,3 +108,57 @@ export const loginExistingUser = async (req, res) => {
 
     }
 }
+
+
+
+//change password
+export const changePassword = async (req, res) => {
+    try {
+
+        // get user id from "auth-middleware"
+        const userID = req.userInfo.userId;
+
+        // extract old password and new password from the request body
+        const { oldPassword, newPassword } = req.body;
+
+        // find the current logged-in user
+        const currentUser = await User.findById(userID);
+
+        if (!currentUser) {
+            return res.status(400).json({
+                isSuccess: false,
+                message: "User not found! Please try again with different credentials."
+            });
+        }
+
+        // check if the "oldPassword "matches with that of the "currentUser"
+        const isPasswordMatch = await bcrypt.compare(oldPassword, currentUser.password);
+
+        if (!isPasswordMatch) {
+            return res.status(400).json({
+                isSuccess: false,
+                message: "Invalid Password! Please try again..."
+            });
+        }
+
+        // hash the "newPassword"
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // update the "currentUser" password
+        currentUser.password = hashedNewPassword;
+        await currentUser.save();
+
+        res.status(200).json({
+            isSuccess: true,
+            message: "Password updated successfully!"
+        });
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            isSuccess: false,
+            message: "An error occured! Something went wrong."
+        });
+    }
+}
