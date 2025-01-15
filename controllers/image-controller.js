@@ -2,6 +2,7 @@ import Image from "../model/image.js";
 import { uploadToCloudinary } from "../helpers/cloudinary-helper.js";
 import fs from "fs";
 import cloudinary from "../config/cloudinary-config.js";
+import { query } from "express";
 
 export const uploadImage = async (req, res) => {
     try {
@@ -46,11 +47,31 @@ export const uploadImage = async (req, res) => {
 
 export const fetchImages = async (req, res) => {
     try {
-        const images = await Image.find({});
+
+        const page = parseInt(req, query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+
+        // skip the images displayed on first page and then render the next ones, to avoid duplication
+        const skip = (page - 1) * limit;
+
+        // default sort by date
+        const sortBy = req.query.sortBy || "createdAt";
+        const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+
+        // use Math.ceil in case we get odd number of images
+        const totalImages = await Image.countDocuments();
+        const totalPages = Math.ceil(totalImages / limit);
+
+
+        const sortObject = {};
+        sortObject[sortBy] = sortOrder;
+
+        const images = await Image.find({}).sort(sortObject).skip(skip).limit(limit);
 
         if (images) {
             return res.status(200).json({
                 isSuccess: true,
+                page: `${page} of ${totalPages}`,
                 message: "Images Fetched Successful!",
                 data: images
             });
