@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth-middleware.js";
 import imageUploadMiddleware from "../middleware/image-upload-middleware.js";
-import { uploadImage, fetchImages } from "../controllers/image-controller.js";
+import { uploadImage, fetchImages, deleteImage } from "../controllers/image-controller.js";
 
 
 
@@ -18,6 +18,11 @@ router.post("/upload",
 
 // get all the images endpoint
 router.get("/all", fetchImages);
+
+
+
+// delete the image endpoint
+router.delete("/:id", authMiddleware, deleteImage);
 
 
 
